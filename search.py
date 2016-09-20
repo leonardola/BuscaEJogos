@@ -132,8 +132,9 @@ def iterativeDeepeningSearch(problem):
     while True:
         path = util.Queue()
         visitedStates = util.Queue()
+        close_nodes = util.Stack()
 
-        found = iterative_recursive_deepening(actualState, max_depth, problem, path, visitedStates)
+        found = iterative_recursive_deepening(actualState, max_depth, problem, path, visitedStates, close_nodes)
 
         if found:
             return path.list
@@ -141,25 +142,27 @@ def iterativeDeepeningSearch(problem):
         max_depth += 1
 
 
-def iterative_recursive_deepening(actual_state, max_depth, problem, path, visitedStates):
+def iterative_recursive_deepening(actual_state, max_depth, problem, path, visitedStates, close_nodes):
+
+    visitedStates.push(actual_state)
 
     if problem.goalTest(actual_state):
         return True
     elif max_depth > 0:
-        visitedStates.push(actual_state)
+        actions = util.Queue()
+
         for action in problem.getActions(actual_state):
             child = problem.getResult(actual_state, action)
+            actions.push(action)
+            close_nodes.push(child)
 
-            if child not in visitedStates.list:
-                found = iterative_recursive_deepening(child, max_depth - 1, problem, path, visitedStates)
+        for action in actions.list:
+            child = close_nodes.pop()
+            if child not in visitedStates.list and child not in close_nodes.list:
+                found = iterative_recursive_deepening(child, max_depth - 1, problem, path, visitedStates, close_nodes)
                 if found:
                     path.push(action)
                     return True
-                elif len(visitedStates.list) > 0:
-
-                    visitedStates.pop()
-            else:
-                print("asd")
     return False
 
 
