@@ -167,9 +167,58 @@ def iterative_recursive_deepening(actual_state, max_depth, problem, path, visite
 
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    actual_state = problem.getStartState()
+    possible_actions = util.PriorityQueue()
+
+    actual_state_cost = heuristic(actual_state, problem)
+
+    path = []
+    visited_nodes = util.Queue()
+    visited_nodes.push(actual_state)
+
+    return recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+
+
+def recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes):
+    if problem.goalTest(actual_state):
+        return path
+
+    actions = problem.getActions(actual_state)
+
+    for action in actions:
+        new_path = copy.copy(path)
+        new_path.append(action)
+        resulting_state = problem.getResult(actual_state, action)
+        action_cost = calculate_cost(actual_state, action, resulting_state, problem, actual_state_cost - heuristic(actual_state, problem), heuristic)
+        possible_actions.push((resulting_state, action_cost, new_path), action_cost)
+
+    new_node_found = False
+    while not new_node_found:
+
+        (actual_state, actual_state_cost, path) = possible_actions.pop()
+
+        if actual_state not in visited_nodes.list:
+            visited_nodes.push(actual_state)
+            new_node_found = True
+
+    path = recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+
+    if path:
+        return path
+        #path.push(action)
+
+    #return found
+
+
+
+def calculate_cost(actual_state, action, resulting_state, problem, cost_so_far, heuristic):
+
+    cost = problem.getCost(actual_state, action)
+
+    if cost:
+        return heuristic(resulting_state, problem) + cost + cost_so_far
+    else:
+        return heuristic(resulting_state, problem) + cost_so_far
 
 
 # Abbreviations
