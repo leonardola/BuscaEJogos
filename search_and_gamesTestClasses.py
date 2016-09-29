@@ -403,6 +403,7 @@ class PacmanSearchTest(testClasses.TestCase):
 
 from game import Actions
 def getStatesFromPath(start, path):
+
     "Returns the list of states visited along the path"
     vis = [start]
     curr = start

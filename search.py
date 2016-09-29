@@ -176,38 +176,42 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     visited_nodes = util.Queue()
     visited_nodes.push(actual_state)
 
-    return recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+    path = recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+
+    return path
 
 
 def recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes):
-    if problem.goalTest(actual_state):
-        return path
 
-    actions = problem.getActions(actual_state)
+    while True:
+        if problem.goalTest(actual_state):
+            return path
 
-    for action in actions:
-        new_path = copy.copy(path)
-        new_path.append(action)
-        resulting_state = problem.getResult(actual_state, action)
-        action_cost = calculate_cost(actual_state, action, resulting_state, problem, actual_state_cost - heuristic(actual_state, problem), heuristic)
-        possible_actions.push((resulting_state, action_cost, new_path), action_cost)
+        actions = problem.getActions(actual_state)
 
-    new_node_found = False
-    while not new_node_found:
+        for action in actions:
+            new_path = copy.copy(path)
+            new_path.append(action)
+            resulting_state = problem.getResult(actual_state, action)
+            action_cost = calculate_cost(actual_state, action, resulting_state, problem, actual_state_cost - heuristic(actual_state, problem), heuristic)
+            possible_actions.push((resulting_state, action_cost, new_path), action_cost)
 
-        (actual_state, actual_state_cost, path) = possible_actions.pop()
+        new_node_found = False
+        while not new_node_found:
 
-        if actual_state not in visited_nodes.list:
-            visited_nodes.push(actual_state)
-            new_node_found = True
+            if possible_actions.isEmpty():
+                return False
 
-    path = recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+            (actual_state, actual_state_cost, path) = possible_actions.pop()
 
-    if path:
-        return path
-        #path.push(action)
+            if actual_state not in visited_nodes.list:
+                visited_nodes.push(actual_state)
+                new_node_found = True
 
-    #return found
+        #path = recursive_a_star_search(problem, actual_state, possible_actions, actual_state_cost, heuristic, path, visited_nodes)
+
+    # if path:
+    #     return path
 
 
 
