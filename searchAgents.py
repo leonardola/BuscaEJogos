@@ -436,14 +436,19 @@ def cornersHeuristic(state, problem):
     if len(reachedCorners) == len(corners):
         return 0 #passou por todos os cantos
 
+    result = 0
+
+    number_of_corners = 0
     for corner in corners:
         cornerX, cornerY = corner
 
         if corner not in reachedCorners:
-            result = (abs(actualPositionX - cornerX ) + abs(actualPositionY - cornerY))
+            number_of_corners += 1
+            result += (abs(actualPositionX - cornerX ) + abs(actualPositionY - cornerY))
+
 
     "*** YOUR CODE HERE ***"
-    return result  # Default to trivial solution
+    return result / number_of_corners # Default to trivial solution
 
 
 class AStarCornersAgent(SearchAgent):
