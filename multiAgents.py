@@ -67,6 +67,7 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
+
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
@@ -74,7 +75,31 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        if successorGameState.isWin():
+            #prefere ganhar a fazer qualquer outra coisa como pegar a capsula que assuta os fantasmas
+            return float("inf")
+        ghost_position = currentGameState.getGhostPosition(1)
+        ghost_distance = util.manhattanDistance(ghost_position, newPos)
+        score = ghost_distance + successorGameState.getScore()
+        food_list = newFood.asList()
+        closest_food = float ("inf")
+        #favorece a comida mais proxima
+        for foodpos in food_list:
+            food_distance = util.manhattanDistance(foodpos, newPos)
+            if (food_distance < closest_food):
+                 closest_food = food_distance
+        #da preferencia para estados que melhorem a pontuaç~o
+        if (currentGameState.getNumFood() > successorGameState.getNumFood()):
+            score += 120
+        #prefere não ficar parado
+        if action == Directions.STOP:
+            score -= 3
+        score -= 3 * closest_food
+        capsuleplaces = currentGameState.getCapsules()
+        if successorGameState.getPacmanPosition() in capsuleplaces:
+            score += 140
+        return score
+
 
 def scoreEvaluationFunction(currentGameState):
     """
