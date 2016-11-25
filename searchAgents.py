@@ -576,9 +576,20 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+
+    actualPosition, foodGrid = state
+    foodData = foodGrid.asList()
+
+    result = 0
+    foodCount = 0
+    for food in foodData:
+        result += ((actualPosition[0] - food[0]) ** 2 + (actualPosition[1] - food[1]) ** 2) ** 0.5
+        foodCount += 1
+
+    if foodCount > 0:
+        return result / foodCount
+    else:
+        return result
 
 
 def mazeDistance(point1, point2, gameState):
