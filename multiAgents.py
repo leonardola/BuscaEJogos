@@ -15,6 +15,7 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import sys
 
 from game import Agent
 
@@ -88,10 +89,10 @@ class ReflexAgent(Agent):
             food_distance = util.manhattanDistance(foodpos, newPos)
             if (food_distance < closest_food):
                  closest_food = food_distance
-        #da preferencia para estados que melhorem a pontuaç~o
+        #da preferencia para estados que melhorem a pontuacao
         if (currentGameState.getNumFood() > successorGameState.getNumFood()):
             score += 120
-        #prefere não ficar parado
+        #prefere nao ficar parado
         if action == Directions.STOP:
             score -= 3
         score -= 3 * closest_food
@@ -136,25 +137,51 @@ class MinimaxAgent(MultiAgentSearchAgent):
       Your minimax agent (question 7)
     """
 
-    def getAction(self, gameState):
-        """
-          Returns the minimax action from the current gameState using self.depth
-          and self.evaluationFunction.
+    def getAction(self, actualGameState):
+        a = self.doMax(actualGameState, 0)
+        return a[1]
 
-          Here are some method calls that might be useful when implementing minimax.
+    def doMax(self, actualGameState, depth):
+        if depth == self.depth:
+            return (self.evaluationFunction(actualGameState), None)
 
-          gameState.getLegalActions(agentIndex):
-            Returns a list of legal actions for an agent
-            agentIndex=0 means Pacman, ghosts are >= 1
+        possibleActions = actualGameState.getLegalActions(0)
+        bestScore = -sys.maxint
+        bestAction = None
 
-          gameState.generateSuccessor(agentIndex, action):
-            Returns the successor game state after an agent takes an action
+        if len(possibleActions) == 0:
+            return (self.evaluationFunction(actualGameState), None)
 
-          gameState.getNumAgents():
-            Returns the total number of agents in the game
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        for action in possibleActions:
+            nextState = actualGameState.generateSuccessor(0, action)
+            nextScore = self.doMin(nextState, 1, depth)[0]
+
+            if (nextScore > bestScore):
+                bestScore, bestAction = nextScore, action
+
+        return (bestScore, bestAction)
+
+    def doMin(self, actualGameState, index, depth):
+        possibleActions = actualGameState.getLegalActions(index)
+        bestScore = sys.maxint
+        bestAction = None
+
+        if len(possibleActions) == 0:
+            return (self.evaluationFunction(actualGameState), None)
+
+        for action in possibleActions:
+            nextState = actualGameState.generateSuccessor(index, action)
+            a = actualGameState.getNumAgents()
+
+            if (index == actualGameState.getNumAgents() - 1):
+                nextScore = self.doMax(nextState, depth + 1)[0]
+            else:
+                nextScore = self.doMin(nextState, index + 1, depth)[0]
+
+            if (nextScore < bestScore):
+                bestScore, bestAction = nextScore, action
+
+        return (bestScore, bestAction)
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
