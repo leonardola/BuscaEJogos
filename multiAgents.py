@@ -184,19 +184,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return (bestScore, bestAction)
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
-    """
-      Your expectimax agent (question 8)
-    """
 
-    def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
+    def getAction(self, actualState):
+        return self.max(actualState, 0)
 
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    def max(self, actualState, turn):
+        if turn == ((actualState.getNumAgents() * self.depth)):
+            return self.evaluationFunction(actualState)
+        else:
+            agentIndex = turn % actualState.getNumAgents()
+            result = {action: self.min(actualState.generateSuccessor(agentIndex, action), turn + 1) for action in actualState.getLegalActions(agentIndex)}
+            if turn == 0:
+                return max(result.iteritems(), key=lambda item: item[1])[0]
+            else:
+                if not result.values():
+                    return self.evaluationFunction(actualState)
+                else:
+                    return max(result.values())
+
+    def min(self, state, turn):
+        if turn == ((state.getNumAgents() * self.depth)):
+            return self.evaluationFunction(state)
+        else:
+            agentIndex = turn % state.getNumAgents()
+            isNextAgentPacman = turn == state.getNumAgents() - 1
+            nextAgentFunction = self.max if isNextAgentPacman else self.min
+            result = {action: nextAgentFunction(state.generateSuccessor(agentIndex, action), turn + 1) for action in state.getLegalActions(agentIndex)}
+            return sum(result.values()) / len(result.values()) if result else self.evaluationFunction(state)
 
 def betterEvaluationFunction(currentGameState):
     """
