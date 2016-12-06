@@ -212,15 +212,26 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             result = {action: nextAgentFunction(state.generateSuccessor(agentIndex, action), turn + 1) for action in state.getLegalActions(agentIndex)}
             return sum(result.values()) / len(result.values()) if result else self.evaluationFunction(state)
 
-def betterEvaluationFunction(currentGameState):
-    """
-      Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-      evaluation function (question 9).
+def betterEvaluationFunction(gameState):
+    pacmanPosition = gameState.getPacmanPosition()
+    availableFoods = gameState.getFood().asList()
 
-      DESCRIPTION: <write something here so we know what you did>
-    """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    if (gameState.isLose()):
+        return -float('inf')
+    elif gameState.isWin():
+        return float('inf')
+    else:
+
+        foodDistances = {}
+        for foodPosition in availableFoods:
+            foodDistances[foodPosition] = util.manhattanDistance(foodPosition, pacmanPosition)
+
+        closestFood = min(foodDistances, key=foodDistances.get)
+
+        nearestFoodDistance = foodDistances[closestFood]
+        score = gameState.getScore()
+        foodCount = len(availableFoods)
+        return score - foodCount - nearestFoodDistance
 
 # Abbreviation
 better = betterEvaluationFunction
